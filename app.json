@@ -1,0 +1,12 @@
+{
+  "name": "EZC",
+  "displayName": "EZC",
+  "expo": {
+    "name": "EZC",
+    "slug": "EZC",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  }
+}
