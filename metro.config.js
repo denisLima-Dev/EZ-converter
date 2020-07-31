@@ -3,3 +3,4 @@ module.exports = {
     assetPlugins: ['expo-asset/tools/hashAssetFiles'],
   },
 };
+

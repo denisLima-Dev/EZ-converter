@@ -7,6 +7,13 @@
     "version": "1.0.0",
     "assetBundlePatterns": [
       "**/*"
+    ],
+    "description": "",
+    "orientation": "portrait",
+    "platforms": [
+      "ios",
+      "android",
+      "web"
     ]
   }
 }
