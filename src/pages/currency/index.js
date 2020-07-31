@@ -154,7 +154,11 @@ checkData = async () => {
   let [ year, month, day ] = this.rates.date.split('-')
   let tYear = today.getFullYear()
   let tMonth = today.getMonth() + 1
-  let tDay = today.getDate()
+  let tDay = today.getDate() - 1
+
+  if (today.getDay === 0){
+    tDay--
+  }
 
   if( tYear > +year ){
     val = await this.getApi()
