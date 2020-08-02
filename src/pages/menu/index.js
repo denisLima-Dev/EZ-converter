@@ -51,6 +51,10 @@ export default function Menu({navigation}) {
                             <Icon name='gauge' style={styles.ico} />
                             <Text style={styles.text}>Pressure</Text>
                         </TouchableOpacity>
+                        <TouchableOpacity style={styles.content} onPress={()=> navigation.navigate('Teste')}>
+                            <Icon name='gauge' style={styles.ico} />
+                            <Text style={styles.text}>Teste</Text>
+                        </TouchableOpacity>
                     </View>
                 </ScrollView>
             </View>
@@ -81,8 +85,8 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        margin: 1,  
-        backgroundColor: 'rgba(240, 240, 240, 1)'
+        margin: 3,  
+        backgroundColor: 'rgba(240, 240, 240, 1)',
             },
 
     text:{

@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { View, Text, TouchableWithoutFeedback , StyleSheet, ScrollView, Dimensions, Animated} from 'react-native'
 import axios from 'axios'
 import AsyncStorage from '@react-native-community/async-storage'
+import { PanGestureHandler , State} from 'react-native-gesture-handler'
 
 import Keyboard from '../../keyboard'
 import {currencyName} from './units'
@@ -17,7 +18,6 @@ class Currency extends Component{
     loaded: false
   }
 
-  //Rates are fixed to not request from API in every test
   rates= {
     base: "USD",
     date: "2020-07-25",
@@ -65,10 +65,28 @@ class Currency extends Component{
     this.setState({loaded: true})
   }
 
+//Read value from keyboard and update values
+updateValue = val => {
+
+  if(val.toString().length > 12){
+    return
+  }
+
+  let i = new Object
+  i['currency'] =  this.Convert(val)
+
+  //i['currency'][this.state.unitInUse] = this.prepareNumber(val)
+  
+  i['value'] = val
+
+  this.setState(i)
+}
+
   prepareNumber = e =>{
     let val = e.toString()
 
     let [int, dec] = val.split('.')
+
     
     if(!int)int = '0'
 
@@ -123,7 +141,7 @@ class Currency extends Component{
   }
 
   truncateValue = e => {
-    let i = +(e.toFixed(2))
+    let i = (e.toFixed(2))
     return(this.prepareNumber(i))
   }
 
@@ -142,23 +160,32 @@ Convert = val => {
 
 getApi = async () => {
     let response = await axios.get('https://api.exchangeratesapi.io/latest?base=USD')
+    console.log('consultou a api')
     return(response.data)
    
 }
 
 checkData = async () => {
-  let today = new Date()
+  let yesterday
 
+  if(new Date().getDay() === 0)
+  {
+    yesterday = new Date(new Date().setHours(-25))
+    
+  }
+  else
+  {
+    yesterday = new Date(new Date().setHours(-1))
+  }
+
+  console.log(yesterday)
   let val = new Object
 
+  
   let [ year, month, day ] = this.rates.date.split('-')
-  let tYear = today.getFullYear()
-  let tMonth = today.getMonth() + 1
-  let tDay = today.getDate() - 1
-
-  if (today.getDay === 0){
-    tDay--
-  }
+  let tYear = yesterday.getFullYear()
+  let tMonth = yesterday.getMonth() + 1
+  let tDay = yesterday.getDate()
 
   if( tYear > +year ){
     val = await this.getApi()
@@ -219,30 +246,13 @@ removeRates = async () => {
 }
 
 
-//Functions to deal with the keypad
-updateValue = val => {
-
-    if(val.toString().length > 12){
-      return
-    }
-
-    let i = new Object
-    i['currency'] =  this.Convert(val)
-
-    i['currency'][this.state.unitInUse] = this.prepareNumber(val)
-    
-    i['value'] = val
-
-    this.setState(i)
-}
-
 //Keyboard Animation
 translateY = new Animated.Value(0)
 
   openKeyboard = () => {
     Animated.timing(this.translateY, {
         toValue: 235,
-        duration: 500,
+        duration: 200,
         useNativeDriver: false
     }).start()
   }
@@ -251,9 +261,37 @@ closeKeyboard = () => {
     this.setState({ unitInUse: ''})
     Animated.timing(this.translateY,{
         toValue: 0,
-        duration: 500,
+        duration: 200,
         useNativeDriver: false
     }).start()
+}
+
+
+onHandlerStateChange = (event) => {
+  if(event.nativeEvent.oldState === State.ACTIVE){
+
+      let closed = false
+
+      let value = 0
+
+      const {translationY} = event.nativeEvent;
+
+      if(translationY >= 80){
+        this.setState({ unitInUse: ''})
+
+        closed = true            
+      }
+
+      Animated.timing(this.translateY,{
+          toValue: closed? 0 : 235,
+          duration: 200,
+          useNativeDriver: false
+      }).start(()=>{
+          value = closed ? 0 : 235
+          this.translateY.setOffset(0)
+          this.translateY.setValue(value)
+      })
+  }
 }
 
 render(){
@@ -261,12 +299,13 @@ render(){
       <View style={{height:'100%', width: '100%', backgroundColor: '#fff'}}>
           <View style={{height: '100%'}}>
             <Animated.View style={{height: this.translateY.interpolate({
-                inputRange: [0,235],
-                outputRange: [(height-90-80), (height-90-215-80)]
+               inputRange: [0, 235],
+               outputRange: [(height-90-80) , (height-90-215-80)],
+               extrapolate:'clamp'
             })}}><View style={{alignItems:'center'}}>
               {this.state.loaded === true ? 
-              <Text style={styles.smallText}>Exchange rates last updated on: {this.rates.date}</Text> :
-              <Text style={styles.smallText}>There is no exchange rate</Text>}
+              <Text style={styles.smallText}>Last updated on: {this.rates.date}</Text> :
+              <Text style={styles.smallText}>Faile to load rates</Text>}
             </View>
                 <ScrollView style={styles.wrapper} showsVerticalScrollIndicator={false}>
                     {Object.keys(currencyName).map(e=>(
@@ -380,20 +419,32 @@ render(){
                         </TouchableWithoutFeedback>
                 </ScrollView>
               </Animated.View>
-              <Animated.View style={[styles.animView, {
-                  height: this.translateY
-              }]}>
-                <View>
-                    <Keyboard 
-                    updateValue={this.updateValue} 
-                    value={this.state.value} 
-                    close={this.closeKeyboard} 
-                    />
-                </View>
-              </Animated.View>
+              <PanGestureHandler
+                onGestureEvent={e=> this.translateY.setValue(235 - e.nativeEvent.translationY)}
+                onHandlerStateChange={this.onHandlerStateChange}>
+                  <Animated.View style={[styles.animView, {
+                   transform:[{
+                    translateY: this.translateY.interpolate({
+                      inputRange:[ 0, 235, 450],
+                      outputRange:[ 0, -235, -250],
+                      extrapolate: 'clamp'
+                    })
+                }]}
+                    ]}>
+                  <View>
+                      <Keyboard 
+                      updateValue={this.updateValue} 
+                      value={this.state.value} 
+                      close={this.closeKeyboard} 
+                      />
+                  </View>
+                </Animated.View>
+              </PanGestureHandler>
+
+              
               <View style={styles.ad}>
-                  <Text>Propaganda</Text>
-                </View>
+                <Text>Propaganda</Text>
+              </View>
           </View>
         </View>
     )
@@ -453,12 +504,12 @@ content:{
 
   animView:{
     position:'absolute', 
-    bottom: 60, 
+    bottom: (-235+80), 
     width: '100%',
     maxWidth: 500,
-    alignSelf:'center',
+    alignSelf: 'center',
     zIndex: 5,
-    height: 0
+
   }
 })
 

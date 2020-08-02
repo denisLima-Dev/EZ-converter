@@ -10,6 +10,9 @@ import Area from '../pages/area'
 import Currency from '../pages/currency'
 import Pressure from '../pages/pressure'
 
+import Teste from '../pages/temperature/teste'
+
+
 const Stack = createStackNavigator();
 
 const screenOption={
@@ -37,6 +40,8 @@ export default function Routes() {
         <Stack.Screen name="Area" component={Area} options={screenOption} />
         <Stack.Screen name="Currency" component={Currency} options={screenOption} />
         <Stack.Screen name="Pressure" component={Pressure} options={screenOption} />
+        <Stack.Screen name="Teste" component={Teste} options={screenOption} />
+
       </Stack.Navigator>
   );
 }

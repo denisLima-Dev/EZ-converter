@@ -87,7 +87,7 @@ export default function KeyPad(props) {
 const styles = StyleSheet.create({
     wrapper:{
         width: '100%',
-        backgroundColor: '#666',
+        backgroundColor: '#FFF',
     },
 
     screen:{
@@ -96,7 +96,9 @@ const styles = StyleSheet.create({
         backgroundColor:  'rgba(29, 41, 29, 0.7)',
         alignItems: 'flex-end' ,
         justifyContent: 'center',
-  
+        borderWidth:1,
+        borderColor:'#FFF',
+        borderRadius:5,
     },
 
     keyboard:{

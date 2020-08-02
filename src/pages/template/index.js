@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { View, Text, TouchableWithoutFeedback , StyleSheet, ScrollView, Dimensions, Animated} from 'react-native'
-
+import { PanGestureHandler, State } from 'react-native-gesture-handler'
 import Keyboard from '../../keyboard'
 
 const { height, width } = Dimensions.get('window');
@@ -114,8 +114,8 @@ translateY = new Animated.Value(0)
   openKeyboard = () => {
     Animated.timing(this.translateY, {
         toValue: 235,
-        duration: 500,
-        useNativeDriver:false
+        duration: 200,
+        useNativeDriver: false
     }).start()
   }
 
@@ -123,9 +123,36 @@ closeKeyboard = () => {
     this.setState({ unitInUse: ''})
     Animated.timing(this.translateY,{
         toValue: 0,
-        duration: 500,
-        useNativeDriver:false
+        duration: 200,
+        useNativeDriver: false
     }).start()
+}
+
+
+onHandlerStateChange = (event) => {
+  if(event.nativeEvent.oldState === State.ACTIVE){
+
+      let closed = false
+
+      let value = 0
+
+      const {translationY} = event.nativeEvent;
+
+      if(translationY >= 80){
+        this.setState({ unitInUse: ''})
+
+        closed = true            
+      }
+
+      Animated.timing(this.translateY,{
+          toValue: closed? 0 : 235,
+          duration: 200,
+          useNativeDriver: false
+      }).start(()=>{
+          value = closed ? 0 : 235
+          this.translateY.setValue(value)
+      })
+  }
 }
 
 render(){
@@ -133,8 +160,9 @@ render(){
       <View style={{height:'100%', width: '100%', backgroundColor: '#fff'}}>
           <View style={{height: '100%'}}>
             <Animated.View style={{height: this.translateY.interpolate({
-                inputRange: [0,235],
-                outputRange: [(height-90-80), (height-90-215-80)]
+                inputRange: [0, 235],
+                outputRange: [(height-90-80) , (height-90-215-80)],
+                extrapolate:'clamp'
             })}}>
                 <ScrollView style={styles.wrapper} showsVerticalScrollIndicator={false}>
                     {Object.keys(this.props.unitName).map(e=>(
@@ -162,17 +190,27 @@ render(){
                     ))}
                 </ScrollView>
               </Animated.View>
-              <Animated.View style={[styles.animView, {
-                  height: this.translateY
-              }]}>
-                <View>
-                    <Keyboard 
-                    updateValue={this.updateValue} 
-                    value={this.state.value} 
-                    close={this.closeKeyboard} 
-                    />
-                </View>
-              </Animated.View>
+              <PanGestureHandler
+                onGestureEvent={e=> this.translateY.setValue(235 - e.nativeEvent.translationY)}
+                onHandlerStateChange={this.onHandlerStateChange}>
+                  <Animated.View style={[styles.animView, {
+                   transform:[{
+                    translateY: this.translateY.interpolate({
+                      inputRange:[ 0, 235, 500],
+                      outputRange:[ 0, -235, -245],
+                      extrapolate: 'clamp'
+                    })
+                }]}
+                    ]}>
+                  <View>
+                      <Keyboard 
+                      updateValue={this.updateValue} 
+                      value={this.state.value} 
+                      close={this.closeKeyboard} 
+                      />
+                  </View>
+                </Animated.View>
+              </PanGestureHandler>
               <View style={styles.ad}>
                   <Text>Propaganda</Text>
                 </View>
@@ -235,12 +273,12 @@ content:{
 
   animView:{
     position:'absolute', 
-    bottom: 60, 
+    bottom: (-235+80), 
     width: '100%',
     maxWidth: 500,
     alignSelf: 'center',
     zIndex: 5,
-    height: 0
+
   }
 })
 
