@@ -7,7 +7,7 @@ import Backspace from '../icons/backspace'
 const { height, width } = Dimensions.get('window');
 
 export default function KeyPad(props) {
-
+    //Function to check if there is another dot on the number
     const checkDot = () => {
         let aux = props.value.toString()
 
@@ -26,7 +26,7 @@ export default function KeyPad(props) {
     return(
         <View style={styles.wrapper}>
             <View style={styles.screen}>
-                <Text style={{color: '#fff', fontSize:16, paddingRight: 5}}>{props.value || 0}</Text>
+                <Text style={styles.screenText}>{props.value || 0}</Text>
             </View>
             <View style={styles.keyboard}>
                 <TouchableHighlight style={styles.key} onPress={()=> props.updateValue(+(props.value + '7') )}>
@@ -74,11 +74,9 @@ export default function KeyPad(props) {
                 <TouchableHighlight style={styles.key} onPress={()=> props.updateValue((props.value.toString().slice(0,-1)))}>
                     <View><Backspace /></View>
                 </TouchableHighlight>
-                <TouchableHighlight style={styles.keyN}>
-                    <View>
+                <View style={styles.keyN}>
 
-                    </View>
-                </TouchableHighlight>
+                </View>
             </View>
         </View>
     )
@@ -126,7 +124,7 @@ const styles = StyleSheet.create({
         width: (width/4),
         maxWidth: (500/4),
         height: 45,
-        backgroundColor: 'rgba(255,199,72,1)', 
+        backgroundColor: 'rgba(255,199,80,1)', 
         borderColor: '#fff',
         borderRadius: 5,
         borderStyle: 'solid',
@@ -164,6 +162,11 @@ const styles = StyleSheet.create({
     text:{
         color: '#fff',
         fontSize: 14,
+    },
 
+    screenText:{
+        color: '#fff', 
+        fontSize:16, 
+        paddingRight: 5
     }
 })

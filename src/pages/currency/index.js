@@ -173,12 +173,15 @@ checkData = async () => {
     yesterday = new Date(new Date().setHours(-25))
     
   }
-  else
+  if(new Date().getDay() === 1)
   {
-    yesterday = new Date(new Date().setHours(-1))
+    yesterday = new Date(new Date().setHours(-49))
+    
   }
+  
+  yesterday = new Date(new Date().setHours(-1))
+  
 
-  console.log(yesterday)
   let val = new Object
 
   

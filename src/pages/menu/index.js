@@ -51,10 +51,10 @@ export default function Menu({navigation}) {
                             <Icon name='gauge' style={styles.ico} />
                             <Text style={styles.text}>Pressure</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={styles.content} onPress={()=> navigation.navigate('Teste')}>
+                        {/*<TouchableOpacity style={styles.content} onPress={()=> navigation.navigate('Teste')}>
                             <Icon name='gauge' style={styles.ico} />
                             <Text style={styles.text}>Teste</Text>
-                        </TouchableOpacity>
+                        </TouchableOpacity>*/}
                     </View>
                 </ScrollView>
             </View>

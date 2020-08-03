@@ -91,7 +91,7 @@ Convert = val => {
 }
 
 
-//Functions to deal with the keypad
+//Functions to values from keypad
 updateValue = val => {
 
     if(val.toString().length > 11){

@@ -41,7 +41,6 @@ export default function Routes() {
         <Stack.Screen name="Currency" component={Currency} options={screenOption} />
         <Stack.Screen name="Pressure" component={Pressure} options={screenOption} />
         <Stack.Screen name="Teste" component={Teste} options={screenOption} />
-
       </Stack.Navigator>
   );
 }
